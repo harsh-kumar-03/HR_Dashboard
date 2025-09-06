@@ -1,8 +1,4 @@
 
---## Data Cleaning
---## Here, I have added a column to the table which has value 1 or 0 depending if attrition is yes or no ,
---## as by summing and counting this column, we would get better insights about attrition
-
 alter table dbo.HR_Analytics
 add attrition_value int;
 
@@ -14,19 +10,13 @@ end from dbo.HR_Analytics
 
 select * from dbo.HR_Analytics
 
---##We had a extra column in our table which has blanks values and column isn't of much use for us for visualizaton purposes.
 
 alter table dbo.HR_Analytics drop column YearsWithCurrManager
-
---##Lets check if we have any duplicate rows in our table.
+-- checking of duplicate rows 
 select empid,ROW_NUMBER() over (partition by empid order by empid) as num_rows
 from dbo.HR_Analytics
 order by 2 desc
 
---##So the data has some duplicate rows in it, so I decided to first import all distinct rows in another table and then
---##I truncated our original table and then added the distinct rows into the table.
---##NOTE:--one can easily do all these steps within excel and power bi , but I still chose to do all the work via SQL and just 
---## use these results in power bi to make visualizations ,just to get most out of SQL.
 
 select distinct * into dbo.HR2
 from dbo.HR_Analytics
@@ -40,9 +30,7 @@ drop table dbo.HR2
 select empid,ROW_NUMBER() over (partition by empid order by empid) as num_rows
 from dbo.HR_Analytics
 order by 2 desc
----##We can see that duplicates are now removed.
 
---##Here, the data has some Travel_Rarely and TravelRarely as two different values in the Buisness Travel column,so I decided to update the values
 
 select BusinessTravel  from dbo.HR_Analytics
 group  by BusinessTravel
@@ -54,11 +42,6 @@ where BusinessTravel='TravelRarely'
 select BusinessTravel  from dbo.HR_Analytics
 group  by BusinessTravel
 
-
---##Our Data is now cleaned,The Next step is to do some analysis on data ,
---##Here ,I have created different views from our data which includes Attrition by Age,Department,Education Field,Job Role,Salary,Years at company ,Gender and overtime.
---##We can further import these saved views in power bi, and do the analysis from there.
---##NOTE:--If the following view are already created one first needs to run the drop view command and then the following queries.
 
 --Table for Attrition vs Age
 drop view if exists AttVSAge
@@ -146,8 +129,6 @@ group by Gender
 
 select * from AttVSGen
 
-
---##one can use the cte here too,
 
 with cte (AgeGroup,emp_attri,count_age)as(
 select AgeGroup,sum(Attrition_value) as [emp_attri] ,count(agegroup)
